@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cichlid TE Pipeline — Script → Output Map</title>
+<style>
+  :root{
+    --bg:#0f1419; --panel:#1a212b; --panel2:#212b38;
+    --ink:#e6edf3; --muted:#8b98a9; --line:#3a4757;
+    --script:#f0a03e; --scriptbg:#3a2a12;
+    --folder:#5fb3f0; --folderbg:#122636;
+    --file:#7ee0a8; --filebg:#10261b;
+    --plot:#c78bf0; --plotbg:#231633;
+    --key:#f0d05f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
+    padding:28px 22px 60px;line-height:1.4}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:22px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 26px;font-size:12px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .chip{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .flow{display:flex;flex-direction:column;gap:0}
+  .stage{position:relative;padding-left:22px;border-left:2px solid var(--line);
+    margin-left:14px;padding-bottom:26px}
+  .stage:last-child{border-left:2px solid transparent}
+  .stagenum{position:absolute;left:-15px;top:0;width:28px;height:28px;border-radius:50%;
+    background:var(--script);color:#1a1206;font-weight:700;font-size:13px;
+    display:flex;align-items:center;justify-content:center;border:3px solid var(--bg)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin-left:10px;max-width:920px}
+  .script{font-family:"Cascadia Code",Consolas,monospace;font-size:15px;font-weight:700;
+    color:var(--script);background:var(--scriptbg);border:1px solid #5a4420;
+    display:inline-block;padding:4px 10px;border-radius:6px;margin-bottom:4px}
+  .runnote{color:var(--muted);font-size:12px;font-style:italic;margin:2px 0 12px}
+  .io{display:grid;grid-template-columns:1fr 26px 1.35fr;gap:10px;align-items:start}
+  .col-h{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .arrow{align-self:center;text-align:center;color:var(--script);font-size:22px;font-weight:700}
+  .box{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin-bottom:8px}
+  .tree{font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;white-space:pre;overflow-x:auto}
+  .fldr{color:var(--folder)} .file{color:var(--file)} .plot{color:var(--plot)}
+  .inp{color:var(--muted);font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px}
+  .tag{font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+  .tag-key{background:#3a3212;color:var(--key);border:1px solid #5a4e1e}
+  .note{color:var(--muted);font-size:12px;margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+  b.k{color:var(--key)}
+  .folderloc{font-size:11px;color:var(--muted);margin-left:10px;margin-bottom:6px}
+</style>
+</head>
+<body>
+  <h1>Cichlid TE Radiation — Script → Output Map</h1>
+  <div class="sub">How each analysis script feeds the next, and exactly what folders &amp; files each one writes. Read top to bottom = run order.</div>
+
+  <div class="legend">
+    <span><i class="chip" style="background:var(--script)"></i>script</span>
+    <span><i class="chip" style="background:var(--folder)"></i>output folder</span>
+    <span><i class="chip" style="background:var(--file)"></i>data table (.tsv)</span>
+    <span><i class="chip" style="background:var(--plot)"></i>figure (.pdf)</span>
+    <span><i class="chip" style="background:var(--key)"></i><b class="k">&nbsp;handoff file</b> (feeds a later script)</span>
+  </div>
+
+  <div class="flow">
+
+    <!-- STAGE 1 -->
+    <div class="stage">
+      <div class="stagenum">1</div>
+      <div class="card">
+        <div class="script">extract_orthogroup_gene_info.py</div>
+        <div class="folderloc">folder 2/insights</div>
+        <div class="runnote">Run once. Traces each single-copy ortholog protein → GeneID → gene coordinates via the GFF3s.</div>
+        <div class="io">
+          <div>
+            <div class="col-h">Inputs</div>
+            <div class="box"><span class="inp">Orthogroups.tsv
+Orthogroups_SingleCopy...txt
+gff3/ (4 African species)</span></div>
+          </div>
+          <div class="arrow">→</div>
+          <div>
+            <div class="col-h">Writes</div>
+            <div class="box tree"><span class="file">OUTPUT_TABLE_orthogroup_gene_info.tsv</span> <span class="tag tag-key">handoff</span>
+<span style="color:var(--muted)">one row per (orthogroup, species, protein):
+chrom · start · end · strand · gene_name</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 2 -->
+    <div class="stage">
+      <div class="stagenum">2</div>
+      <div class="card">
+        <div class="script">te_flanking_analysis.R</div>
+        <div class="folderloc">folder 6/insights &nbsp;(latest: V3)</div>
+        <div class="runnote">Run 4× — once per species. Extends each ortholog ±10 kb, intersects with RepeatMasker TEs, writes a per-species output folder.</div>
+        <div class="io">
+          <div>
+            <div class="col-h">Inputs (per species)</div>
+            <div class="box"><span class="inp"><b class="k">OUTPUT_TABLE_orthogroup_gene_info.tsv</b>
+TE_&lt;species&gt;_genome.fa.out
+GENE_&lt;species&gt;.annotation.gff3</span></div>
+          </div>
+          <div class="arrow">→</div>
+          <div>
+            <div class="col-h">Writes — one folder per species (×4)</div>
+            <div class="box tree"><span class="fldr">&lt;Species&gt;_intersection_outputs/</span>
+├─ <span class="file">master_table.tsv</span> <span class="tag tag-key">handoff</span>
+├─ <span class="file">density_profile.tsv</span> <span class="tag tag-key">handoff</span>
+├─ <span class="file">density_tier_summary.tsv</span>
+├─ <span class="file">genome_wide_composition.tsv</span>
+├─ <span class="file">discarded_TE_orthologs.tsv</span>
+├─ <span class="file">null_random_genes.tsv</span>
+├─ <span class="file">null_random_chunks.tsv</span>
+└─ <span class="fldr">plots/</span>
+   ├─ <span class="fldr">composition/</span> <span class="plot">pct_te_vs_nonTE · te_class_proportions
+   │            top20_orthologs_by_te · genome_vs_flank_breakdown</span>
+   ├─ <span class="fldr">density/</span> <span class="plot">te_density_per_gene_lines.pdf</span>
+   └─ <span class="fldr">summary/</span> <span class="plot">flank_completeness.pdf</span></div>
+          </div>
+        </div>
+        <div class="note">The 4 species folders: <b>Metriaclima_zebra_AF</b>, <b>Pundamilia_nyererei_AF</b>, <b>Oreochromis_niloticus_AF</b>, <b>Neolamprologus_brichardi_AF</b> — each identical in structure.</div>
+      </div>
+    </div>
+
+    <!-- STAGE 3 -->
+    <div class="stage">
+      <div class="stagenum">3</div>
+      <div class="card">
+        <div class="script">cross_species_aggregation.R</div>
+        <div class="folderloc">folder 6/insights &nbsp;(latest: V3)</div>
+        <div class="runnote">Run once, AFTER all 4 species. Reads the 4 per-species tables and compares them.</div>
+        <div class="io">
+          <div>
+            <div class="col-h">Inputs (from stage 2 ×4)</div>
+            <div class="box"><span class="inp"><b class="k">master_table.tsv</b> ×4
+<b class="k">density_profile.tsv</b> ×4</span></div>
+          </div>
+          <div class="arrow">→</div>
+          <div>
+            <div class="col-h">Writes</div>
+            <div class="box tree"><span class="fldr">cross_species_aggregation/</span>
+├─ <span class="plot">combined_density_all_species.pdf</span>
+├─ <span class="plot">heatmap_absolute.pdf</span>
+├─ <span class="plot">heatmap_zscore.pdf</span>
+├─ <span class="plot">top10_variable_orthogroups.pdf</span>
+├─ <span class="file">cross_species_sd_table.tsv</span>
+└─ <span class="file">cross_species_sd_top10.tsv</span> <span class="tag tag-key">handoff</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 4 -->
+    <div class="stage">
+      <div class="stagenum">4</div>
+      <div class="card">
+        <div class="script">top10_ortholog_neighborhoods.R</div>
+        <div class="folderloc">folder 8</div>
+        <div class="runnote">Run once, AFTER aggregation. Draws the ±10 kb neighborhood of each of the 10 most variable orthologs across all 4 species.</div>
+        <div class="io">
+          <div>
+            <div class="col-h">Inputs</div>
+            <div class="box"><span class="inp"><b class="k">cross_species_sd_top10.tsv</b>
+<b class="k">OUTPUT_TABLE_orthogroup_gene_info.tsv</b>
+TE_&lt;species&gt;_genome.fa.out ×4</span></div>
+          </div>
+          <div class="arrow">→</div>
+          <div>
+            <div class="col-h">Writes</div>
+            <div class="box tree"><span class="fldr">top10_ortholog_neighborhoods/</span>
+├─ <span class="file">top10_neighborhood_TEs.tsv</span>
+├─ <span class="plot">top10_neighborhood_01_OG*.pdf … _10_OG*.pdf</span>
+└─ <span class="plot">top10_neighborhoods_combined.pdf</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

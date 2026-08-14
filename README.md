@@ -1,8 +1,8 @@
-# Cichlid Transposable Element (TE) Radiation Pipeline
+# Cichlid Transposable Element (TE) Analysis Pipeline
 
-A small, local pipeline for comparing **transposable element activity in the
+A local pipeline for comparing **transposable element activity in the
 neighborhoods of single-copy orthologous genes** across cichlid species. The
-current implementation covers four African cichlids; it is designed to be
+current implementation covers four African cichlids. it may be
 extended to South American cichlids next (see
 [`FUTURE_DIRECTIONS.docx`](FUTURE_DIRECTIONS.docx)).
 
@@ -17,42 +17,35 @@ genes.
 
 ## Species in the current analysis
 
-| Species | Short code used in files |
+| Species | Short form name used in files |
 |---|---|
 | *Metriaclima zebra* | `Metriaclima_zebra_AF` |
 | *Pundamilia nyererei* | `Pundamilia_nyererei_AF` |
 | *Oreochromis niloticus* | `Oreochromis_niloticus_AF` |
 | *Neolamprologus brichardi* | `Neolamprologus_brichardi_AF` |
 
-`_AF` = African. (`Oreochromis` is the best-annotated of the four and is used as
-the preferred source of gene symbols in the aggregation step.)
-
 ---
 
 ## Repository layout
 
 ```
-cichlid-TE-pipeline/
-├── README.md                     ← you are here
-├── FUTURE_DIRECTIONS.docx        ← next steps / ideas from project meetings (Word doc)
+Cichlid_TE_Analysis/
+├── README.md                     
+├── FUTURE_DIRECTIONS.docx        ← next steps / ideas from project meetings
 ├── scripts/
-│   ├── extract_orthogroup_gene_info.py     STAGE 1 (Python)
-│   ├── V3_te_flanking_analysis.R           STAGE 2 (R, run once per species)
-│   ├── V3_cross_species_aggregation.R      STAGE 3 (R, run once)
-│   └── top10_ortholog_neighborhoods.R      STAGE 4 (R, run once)
+│   ├── extract_orthogroup_gene_info.py     STAGE 1
+│   ├── V3_te_flanking_analysis.R           STAGE 2
+│   ├── V3_cross_species_aggregation.R      STAGE 3
+│   └── top10_ortholog_neighborhoods.R      STAGE 4
 └── docs/
     ├── FULL_PIPELINE_WORKFLOW.docx   Illustrated, plain-language walkthrough
-    │                                 of every step (39 screenshots). Read this
-    │                                 first if you don't read code.
+    │                                 of every step with images. 
     └── PIPELINE_SCRIPT_MAP.html      One-page visual "script → output" map.
                                       Open in any browser.
 ```
 
 > **Note on the data.** The raw genomes, RepeatMasker TE annotations (`.out`),
 > GFF3 annotations, and OrthoFinder outputs are **not** included in this repo —
-> the annotation/TE files alone are several hundred MB each and exceed GitHub's
-> file-size limits. See [Data & where it comes from](#data--where-it-comes-from)
-> below for what each script expects and how to obtain it.
 
 ---
 
@@ -109,7 +102,7 @@ coloured by TE class. This is the figure set discussed in the later meetings.
 
 ## Requirements
 
-- **Python 3** (standard library only — no packages to install for Stage 1).
+- **Python 3** (standard library only).
 - **R** with:
   - Bioconductor: `GenomicRanges`, `IRanges`
     ```r
@@ -120,9 +113,6 @@ coloured by TE class. This is the figure set discussed in the later meetings.
     ```r
     install.packages(c("ggplot2", "dplyr", "data.table"))
     ```
-
-Everything runs comfortably on a normal laptop — no cluster or high-memory
-machine is needed.
 
 ---
 
@@ -164,15 +154,6 @@ Place `cross_species_sd_top10.tsv` (from Stage 3) and
 files where the `USER INPUTS` block expects them, then run
 `scripts/top10_ortholog_neighborhoods.R`.
 
-### ⚠️ The pipeline is not (yet) fully automated end-to-end
-This is a research pipeline, not a one-click program. There is some **manual
-file shuffling between stages** — e.g. copying `OUTPUT_TABLE_orthogroup_gene_info.tsv`
-into each stage's `data/` folder, and moving `cross_species_sd_top10.tsv` from
-Stage 3's output into Stage 4's `data/` folder. Each script's `USER INPUTS`
-block tells you exactly which files it expects and where. Making the whole thing
-flow automatically is listed as a next step in
-[`FUTURE_DIRECTIONS.docx`](FUTURE_DIRECTIONS.docx).
-
 ---
 
 ## Data & where it comes from
@@ -184,17 +165,15 @@ and its origin:
   `Orthogroups_SingleCopyOrthologues.txt`) — produced by running
   [OrthoFinder](https://github.com/davidemms/OrthoFinder) on the four species'
   `protein.fa` files. In this project they were provided ready-made by a
-  collaborator (Jordana).
+  collaborator.
 - **GFF3 gene annotations** (`<species>.annotation.gff3`) — the standard genome
   annotation for each species.
 - **RepeatMasker TE annotations** (`TE_<species>_genome.fa.out`) — RepeatMasker
-  `.out` files, one per genome. Note these have **two** header lines plus a blank
-  line (the parser skips 3 lines accordingly).
+  `.out` files, one per genome.
 
 To reproduce the run, obtain these files, place them in a `data/` (and
 `gff3_files/`) folder next to the scripts as shown above, and follow the run
-order. If you are picking this project up, ask the project owner for the exact
-data bundle used.
+order.
 
 ---
 
@@ -205,35 +184,4 @@ data bundle used.
   you can follow the logic without reading a line of code. **Start here.**
 - **`docs/PIPELINE_SCRIPT_MAP.html`** — a one-page visual of how scripts feed
   each other and exactly what files each writes. Open in a browser.
-- The scripts themselves are heavily commented line-by-line.
 
----
-
-## References & tools
-
-Method/tool references (please verify links against the current published
-versions):
-
-- **OrthoFinder** — Emms DM & Kelly S. (2019). *OrthoFinder: phylogenetic
-  orthology inference for comparative genomics.* Genome Biology.
-- **RepeatMasker** — Smit AFA, Hubley R & Green P. `RepeatMasker` —
-  https://www.repeatmasker.org
-- **GenomicRanges / IRanges** — Lawrence M *et al.* (2013). *Software for
-  computing and annotating genomic ranges.* PLoS Computational Biology
-  (Bioconductor).
-- **African cichlid genomes / adaptive radiation** — Brawand D *et al.* (2014).
-  *The genomic substrate for adaptive radiation in African cichlids.* Nature.
-
-*(A fuller, project-specific reading list can be added here — this section is a
-starting point.)*
-
----
-
-## Handoff note
-
-This repository is the transparent handoff of the cichlid TE pipeline for the
-next person to continue the work (including porting it to the South American
-cichlids). The code is complete and commented; the documentation in `docs/`
-explains every step in plain language. See
-[`FUTURE_DIRECTIONS.docx`](FUTURE_DIRECTIONS.docx) for the agreed next steps and
-open ideas from the project meetings.

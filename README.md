@@ -125,7 +125,7 @@ directory that contains the `data/` and `insights/` folders it expects.
 
 ### Stage 1
 ```bash
-python .\scripts\1_extract_orthogroup_gene_info.py .\Orthogroups_SingleCopyOrthologues.txt --orthogroups-tsv .\Orthogroups.tsv --gff-dir .\gff3\ --output orthogroup_gene_info.tsv
+python .\scripts\1_extract_orthogroup_gene_info.py .\Orthogroups_SingleCopyOrthologues.txt --orthogroups-tsv .\Orthogroups.tsv --gff-dir .\gff3\ --output OUTPUT_TABLE_orthogroup_gene_info.tsv
 ```
 
 ### Stage 2 (repeat for all four species)

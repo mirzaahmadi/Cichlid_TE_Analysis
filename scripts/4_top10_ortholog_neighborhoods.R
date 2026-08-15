@@ -12,7 +12,7 @@
 # =====================================================================
 
 # ---- USER INPUTS ----
-top10_file     <- "data/cross_species_sd_top10.tsv"
+top10_file     <- "insights/cross_species_aggregation/cross_species_sd_top10.tsv"
 gene_info_file <- "data/OUTPUT_TABLE_orthogroup_gene_info.tsv"
 
 # One RepeatMasker .out per species. Named vector order = display order

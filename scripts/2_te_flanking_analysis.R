@@ -10,11 +10,11 @@
 # =====================================================================
 
 # ---- USER INPUTS: change these for each species run ----
-te_file         <- "data/TE_Pundamilia_nyererei_AF_genome.fa.out"
+te_file         <- "data/TE_Oreochromis_niloticus_AF_genome.fa.out"
 orthogroup_file <- "data/OUTPUT_TABLE_orthogroup_gene_info.tsv"
-species_name    <- "Pundamilia_nyererei_AF"
-output_dir      <- "insights/Pundamilia_nyererei_AF_intersection_outputs"
-gff3_file       <- "data/GENE_Pundamilia_nyererei_AF.annotation.gff3"  # optional, for contig lengths
+species_name    <- "Oreochromis_niloticus_AF"
+output_dir      <- "insights/Oreochromis_niloticus_AF_intersection_outputs"
+gff3_file       <- "data/GENE_Oreochromis_niloticus_AF.annotation.gff3"  # optional, for contig lengths
 
 
 NULL_SEED <- 42   # fixed so the sampling is reproducible between runs
@@ -335,7 +335,7 @@ flag_te_orthologs <- function(orth, te_gr, threshold = 0.90) {
 # (one entry per non-empty flank) plus a per-ortholog win_info frame.
 build_flank_windows <- function(orth, contig_len) {
   n <- nrow(orth) # Store the number of orthologs
-  clen <- contig_len[orth$chromosome] # for each ortholog, look up its contig's (note the chromosome name here is a bit of a misnomer, it can mean contig as well) length - so clen is a vector of same number of lengths as n, one per ortholog, in the same order
+  clen <- unname(contig_len[orth$chromosome]) # for each ortholog, look up its contig's (note the chromosome name here is a bit of a misnomer, it can mean contig as well) length - so clen is a vector of same number of lengths as n, one per ortholog, in the same order. unname() strips the vector names: a lookup miss returns an NA name, and those NA names otherwise propagate into the GRanges below and trigger "missing values in 'row.names'".
   clen[is.na(clen)] <- .Machine$integer.max  # unknown contig: no upper cap
 
   # This gets the up_start, up_end (basically the entire 10 000 base pair sequence before the ortholog starts) and the down_start and down_end - each of these is a vector containing all of these positions for every single ortholog - so if there are 8000 orthologs total, each of these variables will have 8000 vectors for ever single one of them

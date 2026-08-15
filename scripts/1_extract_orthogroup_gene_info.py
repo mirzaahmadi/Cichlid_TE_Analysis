@@ -12,10 +12,7 @@ USAGE:
 
 EXPLICIT USAGE:
 
-python3 extract_orthogroup_gene_info.py \
-    --orthogroups-tsv Orthogroups.tsv \
-    --gff-dir 'gff3_files' \ # directory containing the <species>.annotation.gff3 files
-    --output orthogroup_gene_info.tsv # output file name
+python .\scripts\1_extract_orthogroup_gene_info.py .\Orthogroups_SingleCopyOrthologues.txt --orthogroups-tsv .\Orthogroups.tsv --gff-dir .\gff3\ --output .\data\OUTPUT_TABLE_orthogroup_gene_info.tsv
 
 
 

@@ -207,27 +207,6 @@ files where the `USER INPUTS` block expects them, then run
 
 ---
 
-## Data & where it comes from
-
-None of the large data files live in this repo. Here is what each stage needs
-and its origin:
-
-- **OrthoFinder outputs** (`Orthogroups.tsv`,
-  `Orthogroups_SingleCopyOrthologues.txt`) — produced by running
-  [OrthoFinder](https://github.com/davidemms/OrthoFinder) on the four species'
-  `protein.fa` files. In this project they were provided ready-made by a
-  collaborator.
-- **GFF3 gene annotations** (`<species>.annotation.gff3`) — the standard genome
-  annotation for each species.
-- **RepeatMasker TE annotations** (`TE_<species>_genome.fa.out`) — RepeatMasker
-  `.out` files, one per genome.
-
-To reproduce the run, obtain these files, place them in a `data/` (and
-`gff3_files/`) folder next to the scripts as shown above, and follow the run
-order.
-
----
-
 ## Where to read more
 
 - **`docs/FULL_PIPELINE_WORKFLOW.docx`** — the illustrated, plain-language

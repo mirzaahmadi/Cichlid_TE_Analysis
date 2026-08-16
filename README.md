@@ -45,7 +45,8 @@ Cichlid_TE_Analysis/
 ```
 
 > **Note on the data.** The raw genomes, RepeatMasker TE annotations (`.out`),
-> GFF3 annotations, and OrthoFinder outputs are **not** included in this repo —
+> GFF3 annotations, and OrthoFinder outputs are **not** included in this repo.
+> See [Where to get the data](#where-to-get-the-data) for data retrieval.
 
 ---
 
